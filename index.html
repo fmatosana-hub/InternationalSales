@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Studio L · Catálogo & Pedido</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/logo.png">
+</head>
+<body>
+  <header class="topbar">
+    <img src="assets/logo.png" alt="Logo Studio L" class="logo" />
+    <div class="brand">Studio L</div>
+  </header>
+
+  <main class="container">
+    <section id="intro" class="card">
+      <h1>Catálogo & Pedido</h1>
+      <p>Veja o catálogo completo e envie seu pedido. Simples, rápido e sem preços exibidos.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://studioldesign-my.sharepoint.com/:f:/g/personal/commercial_soustudiol_com_br/Emxu4gghXTJPtGF_XXUHMhYB67MkJQVcRWmiPTvvj1joYQ?e=vRoyGM" target="_blank" rel="noopener">Ver Catálogo Completo</a>
+        <button class="btn" onclick="showSection('pedido')">Montar Pedido / Solicitar Orçamento</button>
+      </div>
+    </section>
+
+    <section id="pedido" class="card hidden">
+      <h2>Formulário de Pedido</h2>
+      <p class="note">Preencha os dados abaixo e liste as peças desejadas. Receberemos por e-mail e retornaremos com a Proforma.</p>
+
+      <form id="orderForm" method="POST" action="https://formsubmit.co/Commercial@soustudiol.com.br" onsubmit="return preparePayload()">
+        <input type="hidden" name="_subject" value="Novo Pedido · Studio L">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+
+        <fieldset>
+          <legend>Dados do Cliente</legend>
+          <div class="grid g2">
+            <label>Nome
+              <input type="text" name="cliente_nome" required />
+            </label>
+            <label>Nome da loja / empresa
+              <input type="text" name="cliente_loja" />
+            </label>
+            <label>País (detectado automaticamente; pode alterar)
+              <input type="text" name="cliente_pais" id="cliente_pais" />
+            </label>
+            <label>E-mail
+              <input type="email" name="cliente_email" required />
+            </label>
+            <label>Telefone / WhatsApp
+              <input type="text" name="cliente_tel" />
+            </label>
+            <label>Tipo de cliente
+              <select name="cliente_tipo">
+                <option value="">Selecione…</option>
+                <option>Lojista</option>
+                <option>Arquiteto/Designer</option>
+                <option>Representante</option>
+                <option>Outros</option>
+              </select>
+            </label>
+          </div>
+          <label>Observações gerais
+            <textarea name="observacoes" rows="3" placeholder="Ex.: prazos, cores, dúvidas…"></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Logística e Exportação</legend>
+          <div class="grid g2">
+            <div>
+              <span class="lbl">Meio de envio</span>
+              <label class="inline"><input type="radio" name="envio_meio" value="Aéreo"> Aéreo</label>
+              <label class="inline"><input type="radio" name="envio_meio" value="Marítimo"> Marítimo</label>
+              <label class="inline"><input type="radio" name="envio_meio" value="Terrestre"> Terrestre</label>
+              <label class="inline"><input type="radio" name="envio_meio" value="Ainda não sabe" checked> Ainda não sabe</label>
+            </div>
+            <div>
+              <label>Precisa de Certificado de Origem?
+                <select name="certificado_origem">
+                  <option value="">Selecione…</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                  <option>Ainda não sabe</option>
+                </select>
+              </label>
+            </div>
+            <div>
+              <label>Já exporta?
+                <select name="ja_exporta">
+                  <option value="">Selecione…</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </label>
+            </div>
+            <div>
+              <label>Como será o envio
+                <select name="modal_envio">
+                  <option value="">Selecione…</option>
+                  <option>Exportação direta (Studio L)</option>
+                  <option>Via exportadora parceira</option>
+                  <option>Cliente possui empresa própria de exportação</option>
+                  <option>Ainda não sabe</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Itens do Pedido</legend>
+          <div class="table-wrapper">
+            <table class="tbl" id="itens">
+              <thead>
+                <tr>
+                  <th style="width:64px">Nº</th>
+                  <th>Nome da peça</th>
+                  <th style="width:120px">Quantidade</th>
+                  <th>Observação</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <button class="btn ghost" type="button" onclick="addRow()">Adicionar linha</button>
+          <button class="btn ghost" type="button" onclick="clearRows()">Limpar todas</button>
+        </fieldset>
+
+        <label class="agree">
+          <input type="checkbox" id="agree" required />
+          Li e estou de acordo com os termos de envio e orçamento.
+        </label>
+
+        <input type="hidden" name="pedido_json" id="pedido_json">
+
+        <div class="actions end">
+          <button class="btn" type="button" onclick="showSection('intro')">Voltar</button>
+          <button class="btn primary" type="submit">Enviar Pedido por E-mail</button>
+        </div>
+      </form>
+      <p class="tiny">* Nenhum preço é exibido. Nós retornaremos com a Proforma e condições.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    © Studio L — Catálogo e Pedido
+  </footer>
+
+  <script>
+  function showSection(id) {
+    document.querySelectorAll('main .card').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0,0);
+  }
+  const tbody = document.querySelector('#itens tbody');
+  function addRow() {
+    const idx = tbody.children.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = ''
+      + '<td class="idx">'+idx+'</td>'
+      + '<td><input type="text" name="item_'+idx+'_nome" placeholder="Ex.: Escultura Tríade" /></td>'
+      + '<td><input type="number" min="1" step="1" name="item_'+idx+'_qtd" /></td>'
+      + '<td><input type="text" name="item_'+idx+'_obs" placeholder="Cor, tamanho, variação…" /></td>';
+    tbody.appendChild(tr);
+  }
+  function renumber(){
+    Array.from(tbody.children).forEach((tr,i)=> tr.querySelector('.idx').textContent = i+1);
+  }
+  function clearRows() {
+    tbody.innerHTML = '';
+    for (let i=0;i<10;i++) addRow();
+    renumber();
+  }
+  for (let i=0;i<10;i++) addRow();
+
+  async function detectCountry() {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      document.getElementById('cliente_pais').value = data.country_name || '';
+    } catch(e) { /* ignore */ }
+  }
+  detectCountry();
+
+  function preparePayload() {
+    if (!document.getElementById('agree').checked) {
+      alert('Confirme que leu e concorda com os termos.');
+      return false;
+    }
+    const rows = [];
+    Array.from(tbody.children).forEach((tr,i) => {
+      const inputs = tr.querySelectorAll('input');
+      const nome = inputs[0].value.trim();
+      const qtd  = inputs[1].value.trim();
+      const obs  = inputs[2].value.trim();
+      if (nome || qtd || obs) rows.push({numero:i+1, nome:nome, quantidade:qtd, observacao:obs});
+    });
+    document.getElementById('pedido_json').value = JSON.stringify(rows, null, 2);
+    return true;
+  }
+  </script>
+</body>
+</html>
